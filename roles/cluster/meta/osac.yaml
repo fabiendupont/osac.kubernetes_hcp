@@ -1,3 +1,4 @@
+resource_type: Cluster
 # Define the display name and description of the template
 title: Simple OpenShift 4.17 Cluster
 description: >
