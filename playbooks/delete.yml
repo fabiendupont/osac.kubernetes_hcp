@@ -1,0 +1,114 @@
+---
+# Workflow: Delete Hosted Cluster
+# This workflow deletes a hosted control plane cluster from a ClusterOrder CRD.
+# Major workflow phases can be overridden, and hooks allow customization at workflow boundaries.
+#
+# Usage:
+#   - name: Delete cluster
+#     ansible.builtin.import_playbook: osac.kubernetes_hcp.delete
+#     vars:
+#       cluster_order: "{{ osac_resource }}"
+#
+# Hook example:
+#   - name: Delete cluster with custom hooks
+#     ansible.builtin.import_playbook: osac.kubernetes_hcp.delete
+#     vars:
+#       cluster_order: "{{ osac_resource }}"
+#       hook_workflow_start:
+#         name: my_custom_hooks
+#         tasks_from: pre_delete.yml
+
+- name: Delete hosted cluster workflow
+  hosts: localhost
+  gather_facts: false
+  environment:
+    K8S_AUTH_KUBECONFIG: "{{ lookup('env', 'K8S_AUTH_KUBECONFIG') | default(lookup('env', 'KUBECONFIG'), true) | default(lookup('env', 'HOME') + '/.kube/config', true) }}"
+
+
+  vars:
+    cluster_order: "{{ osac_resource }}"
+
+    # GENERIC HOOKS - Default to noop
+    hook_workflow_start_default:
+      name: osac.service.workflow_helpers
+      tasks_from: noop.yml
+
+    hook_workflow_complete_default:
+      name: osac.service.workflow_helpers
+      tasks_from: noop.yml
+
+    # PHASE OVERRIDE - Only defaults application is overrideable
+    step_apply_defaults_default:
+      name: osac.kubernetes_hcp.cluster_settings
+      tasks_from: main.yml
+
+  collections:
+    - osac.service
+
+  pre_tasks:
+    # HOOK: Workflow start
+    - name: Hook - Workflow start
+      ansible.builtin.include_role:
+        name: "{{ (hook_workflow_start | default(hook_workflow_start_default)).name }}"
+        tasks_from: "{{ (hook_workflow_start | default(hook_workflow_start_default)).tasks_from }}"
+
+    # CRITICAL: Extract cluster order name (NOT overrideable)
+    - name: Set cluster order name
+      ansible.builtin.set_fact:
+        cluster_order_name: "{{ cluster_order.metadata.name }}"
+
+    # PHASE: Apply defaults (overrideable for custom default logic)
+    - name: Step - Apply default settings
+      ansible.builtin.include_role:
+        name: "{{ (step_apply_defaults_override | default(step_apply_defaults_default)).name }}"
+        tasks_from: "{{ (step_apply_defaults_override | default(step_apply_defaults_default)).tasks_from | default(omit) }}"
+
+    # CRITICAL: Extract template info (NOT overrideable)
+    - name: Extract template ID
+      ansible.builtin.set_fact:
+        template_id: "{{ cluster_order.spec.templateID }}"
+      when: template_id is not defined
+
+    - name: Qualify unqualified template IDs
+      ansible.builtin.set_fact:
+        template_id: "osac.kubernetes_hcp.{{ template_id }}"
+      when: "'.' not in template_id"
+
+    - name: Extract template parameters
+      ansible.builtin.set_fact:
+        template_parameters: "{{ cluster_order.spec.templateParameters | from_json }}"
+      when: template_parameters is not defined
+
+    - name: Extract node requests
+      ansible.builtin.set_fact:
+        node_requests: "{{ cluster_order.spec.nodeRequests }}"
+      when: node_requests is not defined
+
+    # CRITICAL: Determine namespace (NOT overrideable)
+    - name: Determine working namespace
+      ansible.builtin.include_role:
+        name: osac.kubernetes_hcp.cluster_working_namespace
+      vars:
+        cluster_working_namespace_cluster_order_name: "{{ cluster_order_name }}"
+
+  tasks:
+    - name: Display cluster deletion information
+      ansible.builtin.debug:
+        msg:
+          - "Deleting cluster: {{ cluster_order.metadata.name }}"
+          - "Cluster working namespace: {{ cluster_working_namespace }}"
+          - "Template ID: {{ template_id_override | default(template_id) }}"
+
+    # CRITICAL: Call template (NOT overrideable, but template has internal override points)
+    - name: Call selected template
+      ansible.builtin.include_role:
+        name: "{{ template_id_override | default(template_id) }}"
+        tasks_from: delete
+
+    # Finalizers are managed by the operator before/after AAP dispatch.
+
+    # HOOK: Workflow complete
+    - name: Hook - Workflow complete
+      ansible.builtin.include_role:
+        name: "{{ (hook_workflow_complete | default(hook_workflow_complete_default)).name }}"
+        tasks_from: "{{ (hook_workflow_complete | default(hook_workflow_complete_default)).tasks_from }}"
