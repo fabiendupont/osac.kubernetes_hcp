@@ -44,18 +44,18 @@
 
         # Override all 4 extension points
         hook_workflow_start:
-          name: osac.test_overrides.workflow_hooks
+          name: osac.service.workflow_hooks
           tasks_from: workflow_start.yml
 
         hook_workflow_complete:
-          name: osac.test_overrides.workflow_hooks
+          name: osac.service.workflow_hooks
           tasks_from: workflow_complete.yml
 
         step_apply_defaults_override:
-          name: osac.test_overrides.cluster_hooks
+          name: osac.service.cluster_hooks
           tasks_from: apply_defaults.yml
 
-        template_id_override: osac.test_overrides.test_template
+        template_id_override: osac.service.test_template
 
         workflow_name: cluster_post_install
 

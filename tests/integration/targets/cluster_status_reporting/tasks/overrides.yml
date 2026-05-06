@@ -29,11 +29,11 @@
 
         # Override 2 extension points
         hook_workflow_start:
-          name: osac.test_overrides.workflow_hooks
+          name: osac.service.workflow_hooks
           tasks_from: workflow_start.yml
 
         hook_workflow_complete:
-          name: osac.test_overrides.workflow_hooks
+          name: osac.service.workflow_hooks
           tasks_from: workflow_complete.yml
 
 - name: Import cluster status reporting workflow with overrides

@@ -15,7 +15,7 @@
         osac_resource: "{{ test_cluster_order }}"
         cluster_working_namespace: "cluster-test-cluster-work"
         # Override template to use no-op version for testing
-        template_id_override: "osac.test_overrides.noop_template"
+        template_id_override: "osac.service.noop_template"
         admin_kubeconfig: |
           apiVersion: v1
           kind: Config
