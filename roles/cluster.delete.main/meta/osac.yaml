@@ -1,0 +1,7 @@
+resource_type: ClusterOrder
+event: Delete
+phase: main
+priority: 100
+failure_policy: Fail
+parameters: []
+outputs: []

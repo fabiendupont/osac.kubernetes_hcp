@@ -1,7 +1,7 @@
 - name: Set install step defaults
   ansible.builtin.set_fact:
     install_step_pre_install_hook_default:
-      name: osac.kubernetes_hcp.cluster
+      name: osac.kubernetes_hcp.cluster.create.main
       tasks_from: noop.yaml
     install_step_hosted_cluster_default:
       name: osac.kubernetes_hcp.hosted_cluster
@@ -19,7 +19,7 @@
       name: osac.service.wait_for
       tasks_from: wait_for_cluster_operators.yaml
     install_step_post_install_hook_default:
-      name: osac.kubernetes_hcp.cluster
+      name: osac.kubernetes_hcp.cluster.create.main
       tasks_from: noop.yaml
 
 - name: Step - Pre-install hook

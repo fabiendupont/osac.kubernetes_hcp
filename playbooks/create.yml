@@ -124,8 +124,7 @@
     # CRITICAL: Call template (NOT overrideable, but template has internal override points)
     - name: Call selected template
       ansible.builtin.include_role:
-        name: "{{ template_id_override | default(template_id) }}"
-        tasks_from: install
+        name: "{{ template_id_override | default(template_id + '.create.main') }}"
 
     # HOOK: Workflow complete
     - name: Hook - Workflow complete

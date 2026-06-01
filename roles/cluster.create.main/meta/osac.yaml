@@ -1,0 +1,10 @@
+resource_type: ClusterOrder
+event: Create
+phase: main
+priority: 100
+failure_policy: Fail
+parameters: []
+outputs:
+  - name: cluster_id
+    type: string
+    description: Created cluster ID

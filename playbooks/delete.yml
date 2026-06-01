@@ -102,8 +102,7 @@
     # CRITICAL: Call template (NOT overrideable, but template has internal override points)
     - name: Call selected template
       ansible.builtin.include_role:
-        name: "{{ template_id_override | default(template_id) }}"
-        tasks_from: delete
+        name: "{{ template_id_override | default(template_id + '.delete.main') }}"
 
     # Finalizers are managed by the operator before/after AAP dispatch.
 

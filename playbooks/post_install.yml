@@ -99,7 +99,7 @@
     # CRITICAL: Call template (NOT overrideable, but template has internal override points)
     - name: Post-install cluster configuration
       ansible.builtin.include_role:
-        name: "{{ template_id_override | default(template_id) }}"
+        name: "{{ template_id_override | default(template_id + '.create.main') }}"
         tasks_from: post_install
 
     # HOOK: Workflow complete

@@ -1,0 +1,3 @@
+- name: Create cluster
+  ansible.builtin.import_role:
+    name: osac.kubernetes_hcp.cluster.create.main
