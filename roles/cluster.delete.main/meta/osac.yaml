@@ -3,5 +3,16 @@ event: Delete
 phase: main
 priority: 100
 failure_policy: Fail
-parameters: []
+
+title: HCP Kubernetes Cluster Deletion
+description: >
+  Deprovisions an OpenShift cluster via Hosted Control Planes.
+  Destroys hosted cluster, external access, and cluster infrastructure.
+
+parameters:
+  - name: cluster_order
+    type: dict
+    required: true
+    description: ClusterOrder resource to deprovision
+
 outputs: []

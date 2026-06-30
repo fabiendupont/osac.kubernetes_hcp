@@ -3,7 +3,18 @@ event: Create
 phase: main
 priority: 100
 failure_policy: Fail
-parameters: []
+
+title: HCP Kubernetes Cluster with GitHub Integration
+description: >
+  Provisions an OpenShift cluster via Hosted Control Planes with
+  GitHub-based GitOps integration. Delegates to cluster.create.main.
+
+parameters:
+  - name: cluster_order
+    type: dict
+    required: true
+    description: ClusterOrder resource from fulfillment-service
+
 outputs:
   - name: cluster_id
     type: string

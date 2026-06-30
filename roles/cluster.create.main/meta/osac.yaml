@@ -3,7 +3,19 @@ event: Create
 phase: main
 priority: 100
 failure_policy: Fail
-parameters: []
+
+title: HCP Kubernetes Cluster Provisioning
+description: >
+  Provisions an OpenShift cluster via Hosted Control Planes.
+  Orchestrates hosted_cluster, cluster_infra, external_access,
+  kubeconfig retrieval, and cluster operator readiness steps.
+
+parameters:
+  - name: cluster_order
+    type: dict
+    required: true
+    description: ClusterOrder resource from fulfillment-service
+
 outputs:
   - name: cluster_id
     type: string
